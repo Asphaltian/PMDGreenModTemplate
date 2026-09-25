@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>pmd_green_mod_template</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="$(PMDGreenPath)\pmd_green.dll" Private="false" />
+    <Reference Include="$(PMDGreenPath)\RecompiledFuncs.dll" Private="false" />
+    <Reference Include="$(PMDGreenPath)\LibRecomp.dll" Private="false" />
+    <Reference Include="$(PMDGreenPath)\AGBModern.dll" Private="false" />
+    <Reference Include="$(PMDGreenPath)\GBARenderer.dll" Private="false" />
+  </ItemGroup>
+
+  <Target Name="CheckPMDGreenPath" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="!Exists('$(PMDGreenPath)\pmd_green.dll')" Text="Set PMDGreenPath to the folder pmd_green is in." />
+  </Target>
+
+  <Target Name="PackMod" AfterTargets="Build">
+    <PropertyGroup>
+      <ModFolder>$(IntermediateOutputPath)mod\</ModFolder>
+    </PropertyGroup>
+    <RemoveDir Directories="$(ModFolder)" />
+    <Copy SourceFiles="mod.json;@(IntermediateAssembly)" DestinationFolder="$(ModFolder)" />
+    <Copy SourceFiles="thumb.png" DestinationFolder="$(ModFolder)" Condition="Exists('thumb.png')" />
+    <Copy SourceFiles="@(ModFile)" DestinationFiles="@(ModFile->'$(ModFolder)%(Identity)')" />
+    <ZipDirectory SourceDirectory="$(ModFolder)" DestinationFile="$(OutDir)$(AssemblyName).zip" Overwrite="true" />
+  </Target>
+
+</Project>
